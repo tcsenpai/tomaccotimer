@@ -5,15 +5,15 @@
 Inverse Pomodoro. You start working, stop when done, and earn a break equal to a
 fraction of the time you worked (default 1/5).
 
-## Use directly (no notifications)
+<img width="877" height="672" alt="CleanShot 2026-07-02 at 09 46 40" src="https://github.com/user-attachments/assets/ef669a02-e4ea-49dd-b6a4-4c793194b3e9" />
 
-Open `index.html` in a browser. No build.
+## Features
 
-- **Start working** — timer counts up.
-- **Stop & take break** — earns `worked ÷ ratio` of break, counts down, beeps at 0.
-- **Ratio** — editable (5 = one fifth of worked time).
-- **Reset** — abandon current work session.
-- **Pop out** — floating always-on-top window (Document Picture-in-Picture). Chromium 116+ only, needs a server (https/localhost). Button hidden where unsupported.
+- PIP mode to keep your timer handy
+- Customizable break gain
+- Distraction free
+- Ultra minimalist
+- Single file
 
 ## Run with server (allows notifications once break ends)
 
