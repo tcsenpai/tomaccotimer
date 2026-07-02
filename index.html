@@ -8,13 +8,18 @@
   :root { --bg:#1a1a2e; --fg:#eee; --accent:#e94560; --break:#16c79a; }
   * { box-sizing:border-box; margin:0; }
   body {
-    font-family:system-ui,sans-serif; background:var(--bg); color:var(--fg);
+    font-family:system-ui,sans-serif; color:var(--fg);
+    background:linear-gradient(135deg,#2a1a4e 0%,#1a1a2e 45%,#3a1c5c 100%);
+    background-attachment:fixed;
     min-height:100vh; display:flex; flex-direction:column; align-items:center;
     justify-content:center; gap:1.5rem; padding:1rem; text-align:center;
   }
   h1 { font-size:1.4rem; opacity:.7; font-weight:500; }
   #time { font-size:clamp(3rem,18vw,7rem); font-variant-numeric:tabular-nums; font-weight:700; }
   #label { font-size:1rem; opacity:.6; text-transform:uppercase; letter-spacing:.15em; }
+  #earned { font-size:.95rem; opacity:.75; color:var(--break); font-variant-numeric:tabular-nums;
+    visibility:hidden; }
+  #earned.show { visibility:visible; }
   .btns { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
   button {
     font-size:1.1rem; padding:.7rem 1.6rem; border:none; border-radius:999px;
@@ -33,6 +38,7 @@
   <h1>Tomacco Timer 🍅</h1>
   <div id="label">ready</div>
   <div id="time">00:00</div>
+  <div id="earned">break earned: 00:00</div>
   <div class="btns">
     <button id="main">Start working</button>
     <button id="reset" class="ghost" disabled>Reset</button>
@@ -45,7 +51,7 @@
 <script>
 // States: idle -> working -> resting -> idle
 const $ = id => document.getElementById(id);
-const timeEl=$('time'), labelEl=$('label'), mainBtn=$('main'), resetBtn=$('reset'), ratioEl=$('ratio');
+const timeEl=$('time'), labelEl=$('label'), mainBtn=$('main'), resetBtn=$('reset'), ratioEl=$('ratio'), earnedEl=$('earned');
 
 let state='idle';
 let startMs=0;          // when current phase started (perf clock, monotonic)
@@ -62,7 +68,10 @@ function fmt(sec){
 
 function render(){
   if(state==='working'){
-    timeEl.textContent=fmt((now()-startMs)/1000);
+    const worked=(now()-startMs)/1000;
+    timeEl.textContent=fmt(worked);
+    const ratio=Math.max(1,parseFloat(ratioEl.value)||5);
+    earnedEl.textContent='break earned: '+fmt(worked/ratio);
   } else if(state==='resting'){
     const left=earnedSec-(now()-startMs)/1000;
     if(left<=0){ finishBreak(); return; }
@@ -77,6 +86,7 @@ function startWork(){
   labelEl.textContent='working';
   mainBtn.textContent='Stop & take break';
   resetBtn.disabled=false;
+  earnedEl.classList.add('show');
   render();
   tick=setInterval(render,250);
 }
@@ -87,6 +97,7 @@ function startBreak(){
   earnedSec=workedSec/ratio;
   if(earnedSec<1){ finishBreak(); return; }   // ponytail: too little worked, nothing to rest
   state='resting'; startMs=now();
+  earnedEl.classList.remove('show');
   document.body.classList.add('breaking');
   labelEl.textContent='break — '+fmt(earnedSec)+' earned';
   mainBtn.textContent='Skip break';
@@ -96,6 +107,7 @@ function startBreak(){
 function finishBreak(){
   clearInterval(tick); tick=null;
   document.body.classList.remove('breaking');
+  earnedEl.classList.remove('show');
   state='idle';
   labelEl.textContent='break done — go again';
   timeEl.textContent='00:00';
@@ -110,6 +122,7 @@ function reset(){
   clearInterval(tick); tick=null;
   state='idle';
   document.body.classList.remove('breaking');
+  earnedEl.classList.remove('show');
   labelEl.textContent='ready';
   timeEl.textContent='00:00';
   mainBtn.textContent='Start working';
