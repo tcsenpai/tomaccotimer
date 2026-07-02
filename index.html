@@ -19,6 +19,31 @@
   h1 { font-size:1.4rem; opacity:.7; font-weight:500;
     display:flex; flex-direction:column; align-items:center; gap:.6rem; }
   .logo { height:5rem; width:auto; opacity:1; }
+  .titlerow { display:inline-flex; align-items:center; gap:.5rem; position:relative; }
+  .info {
+    width:1.5rem; height:1.5rem; border-radius:50%; padding:0; font-size:.9rem;
+    font-style:italic; font-weight:700; background:#ffffff22; border:1px solid #ffffff44;
+    color:var(--fg); line-height:1; cursor:pointer;
+  }
+  /* hover tooltip */
+  .info::after {
+    content:attr(data-tip); position:absolute; top:130%; left:50%; transform:translateX(-50%);
+    width:15rem; background:#0f0f1e; color:var(--fg); border:1px solid #ffffff33;
+    border-radius:8px; padding:.6rem .7rem; font-size:.75rem; font-weight:400; font-style:normal;
+    line-height:1.35; text-transform:none; letter-spacing:normal; opacity:0; pointer-events:none;
+    transition:opacity .15s; z-index:5;
+  }
+  .info:hover::after { opacity:1; }
+  dialog {
+    max-width:26rem; border:1px solid #ffffff33; border-radius:14px; color:var(--fg);
+    background:linear-gradient(135deg,#2a1a4e,#1a1a2e); padding:1.4rem 1.5rem;
+  }
+  dialog::backdrop { background:#0009; }
+  dialog h2 { font-size:1.1rem; margin-bottom:.7rem; }
+  dialog p { margin-bottom:.7rem; font-size:.9rem; line-height:1.4; }
+  dialog ol { text-align:left; margin:0 0 1rem 1.1rem; font-size:.85rem; line-height:1.5; display:grid; gap:.35rem; }
+  dialog code { background:#ffffff1a; padding:.1em .35em; border-radius:4px; }
+  dialog form { display:flex; justify-content:flex-end; }
   #time { font-size:clamp(3rem,18vw,7rem); font-variant-numeric:tabular-nums; font-weight:700; }
   #label { font-size:1rem; opacity:.6; text-transform:uppercase; letter-spacing:.15em; }
   #earned { font-size:.95rem; opacity:.75; color:var(--break); font-variant-numeric:tabular-nums;
@@ -41,7 +66,14 @@
 </style>
 </head>
 <body>
-  <h1><img src="tomacco.png" alt="" class="logo">Tomacco Timer</h1>
+  <h1>
+    <img src="tomacco.png" alt="" class="logo">
+    <span class="titlerow">
+      Tomacco Timer
+      <button id="info" class="info" aria-label="How it works"
+        data-tip="Work timer counts UP. Stop when done — you earn a break equal to your worked time ÷ ratio (default 1/5). Click for details.">i</button>
+    </span>
+  </h1>
   <div id="stage">
     <div id="label">ready</div>
     <div id="time">00:00</div>
@@ -52,6 +84,18 @@
     <button id="reset" class="ghost" disabled>Reset</button>
     <button id="pip" class="ghost" hidden>Pop out</button>
   </div>
+  <dialog id="howto">
+    <h2>How Tomacco works 🍅</h2>
+    <p><b>Inverse Pomodoro.</b> Instead of fixed work/break blocks, your break is earned from what you actually worked.</p>
+    <ol>
+      <li><b>Start working</b> — timer counts up while you focus.</li>
+      <li><b>Stop &amp; take break</b> — you earn <code>worked ÷ ratio</code> of break time (ratio default 5 = one fifth).</li>
+      <li>Break counts down, beeps + notifies when done.</li>
+      <li><b>Reset</b> abandons the current session. <b>Pop out</b> floats an always-on-top window (Chromium only).</li>
+    </ol>
+    <form method="dialog"><button class="ghost">Got it</button></form>
+  </dialog>
+
   <label class="ratio">
     Break = worked time ÷
     <input id="ratio" type="number" min="1" step="1" value="5">
@@ -177,6 +221,9 @@ async function togglePip(){
 // keep pip body class in sync with break color
 const syncPip=()=>{ if(pipWin) pipWin.document.body.className=document.body.className; };
 pipBtn.onclick=togglePip;
+
+// info modal
+$('info').onclick=()=>$('howto').showModal();
 
 mainBtn.onclick=()=>{
   if(state==='idle') startWork();
