@@ -20,6 +20,7 @@
   #earned { font-size:.95rem; opacity:.75; color:var(--break); font-variant-numeric:tabular-nums;
     visibility:hidden; }
   #earned.show { visibility:visible; }
+  #stage { display:flex; flex-direction:column; align-items:center; gap:.6rem; }
   .btns { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
   button {
     font-size:1.1rem; padding:.7rem 1.6rem; border:none; border-radius:999px;
@@ -36,12 +37,15 @@
 </head>
 <body>
   <h1>Tomacco Timer 🍅</h1>
-  <div id="label">ready</div>
-  <div id="time">00:00</div>
-  <div id="earned">break earned: 00:00</div>
+  <div id="stage">
+    <div id="label">ready</div>
+    <div id="time">00:00</div>
+    <div id="earned">break earned: 00:00</div>
+  </div>
   <div class="btns">
     <button id="main">Start working</button>
     <button id="reset" class="ghost" disabled>Reset</button>
+    <button id="pip" class="ghost" hidden>Pop out</button>
   </div>
   <label class="ratio">
     Break = worked time ÷
@@ -67,6 +71,7 @@ function fmt(sec){
 }
 
 function render(){
+  syncPip();
   if(state==='working'){
     const worked=(now()-startMs)/1000;
     timeEl.textContent=fmt(worked);
@@ -109,6 +114,7 @@ function finishBreak(){
   document.body.classList.remove('breaking');
   earnedEl.classList.remove('show');
   state='idle';
+  if(pipWin) pipWin.document.body.className=document.body.className;
   labelEl.textContent='break done — go again';
   timeEl.textContent='00:00';
   mainBtn.textContent='Start working';
@@ -136,6 +142,36 @@ function beep(){
   g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.4);
   o.start(); o.stop(ac.currentTime+.4);
 }
+
+// Document Picture-in-Picture (Chromium 116+, https/localhost only)
+const stage=$('stage'), pipBtn=$('pip');
+let pipWin=null;
+if('documentPictureInPicture'in window) pipBtn.hidden=false;
+
+async function togglePip(){
+  if(pipWin){ pipWin.close(); return; }
+  pipWin=await documentPictureInPicture.requestWindow({width:280,height:180});
+  // copy styles into pip document
+  for(const sheet of document.styleSheets){
+    try{
+      const css=[...sheet.cssRules].map(r=>r.cssText).join('');
+      const s=pipWin.document.createElement('style'); s.textContent=css;
+      pipWin.document.head.appendChild(s);
+    }catch(e){}
+  }
+  pipWin.document.body.style.cssText='background:linear-gradient(135deg,#2a1a4e,#1a1a2e,#3a1c5c);'+
+    'color:#eee;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;';
+  pipWin.document.body.className=document.body.className;
+  pipWin.document.body.append(stage);       // move live nodes into pip
+  pipBtn.textContent='Pop in';
+  pipWin.addEventListener('pagehide',()=>{   // fires on close (button or system)
+    document.querySelector('h1').after(stage); // put stage back after title
+    pipBtn.textContent='Pop out'; pipWin=null;
+  });
+}
+// keep pip body class in sync with break color
+const syncPip=()=>{ if(pipWin) pipWin.document.body.className=document.body.className; };
+pipBtn.onclick=togglePip;
 
 mainBtn.onclick=()=>{
   if(state==='idle') startWork();

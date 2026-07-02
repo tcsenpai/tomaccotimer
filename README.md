@@ -11,6 +11,7 @@ Open `index.html` in a browser. No build.
 - **Stop & take break** — earns `worked ÷ ratio` of break, counts down, beeps at 0.
 - **Ratio** — editable (5 = one fifth of worked time).
 - **Reset** — abandon current work session.
+- **Pop out** — floating always-on-top window (Document Picture-in-Picture). Chromium 116+ only, needs a server (https/localhost). Button hidden where unsupported.
 
 ## Run with server (allows notifications once break ends)
 
