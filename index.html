@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tomacco Timer</title>
+<link rel="icon" href="tomacco.png">
+<link rel="apple-touch-icon" href="tomacco.png">
 <style>
   :root { --bg:#1a1a2e; --fg:#eee; --accent:#e94560; --break:#16c79a; }
   * { box-sizing:border-box; margin:0; }
@@ -14,7 +16,9 @@
     min-height:100vh; display:flex; flex-direction:column; align-items:center;
     justify-content:center; gap:1.5rem; padding:1rem; text-align:center;
   }
-  h1 { font-size:1.4rem; opacity:.7; font-weight:500; }
+  h1 { font-size:1.4rem; opacity:.7; font-weight:500;
+    display:flex; align-items:center; gap:.5rem; }
+  .logo { height:1.6em; width:auto; }
   #time { font-size:clamp(3rem,18vw,7rem); font-variant-numeric:tabular-nums; font-weight:700; }
   #label { font-size:1rem; opacity:.6; text-transform:uppercase; letter-spacing:.15em; }
   #earned { font-size:.95rem; opacity:.75; color:var(--break); font-variant-numeric:tabular-nums;
@@ -37,7 +41,7 @@
 </style>
 </head>
 <body>
-  <h1>Tomacco Timer 🍅</h1>
+  <h1><img src="tomacco.png" alt="" class="logo">Tomacco Timer</h1>
   <div id="stage">
     <div id="label">ready</div>
     <div id="time">00:00</div>
