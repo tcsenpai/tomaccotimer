@@ -5,6 +5,8 @@
 Inverse Pomodoro. You start working, stop when done, and earn a break equal to a
 fraction of the time you worked (default 1/5).
 
+Free and without ads: https://tcsenpai.github.io/tomaccotimer/
+
 <img width="877" height="672" alt="CleanShot 2026-07-02 at 09 46 40" src="https://github.com/user-attachments/assets/ef669a02-e4ea-49dd-b6a4-4c793194b3e9" />
 
 ## Features
