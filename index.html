@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tomacco Timer</title>
+<style>
+  :root { --bg:#1a1a2e; --fg:#eee; --accent:#e94560; --break:#16c79a; }
+  * { box-sizing:border-box; margin:0; }
+  body {
+    font-family:system-ui,sans-serif; background:var(--bg); color:var(--fg);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:1.5rem; padding:1rem; text-align:center;
+  }
+  h1 { font-size:1.4rem; opacity:.7; font-weight:500; }
+  #time { font-size:clamp(3rem,18vw,7rem); font-variant-numeric:tabular-nums; font-weight:700; }
+  #label { font-size:1rem; opacity:.6; text-transform:uppercase; letter-spacing:.15em; }
+  .btns { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
+  button {
+    font-size:1.1rem; padding:.7rem 1.6rem; border:none; border-radius:999px;
+    background:var(--accent); color:#fff; cursor:pointer; font-weight:600;
+  }
+  button:disabled { opacity:.35; cursor:default; }
+  button.ghost { background:transparent; border:1px solid #ffffff33; }
+  .ratio { display:flex; align-items:center; gap:.5rem; font-size:.9rem; opacity:.7; }
+  .ratio input { width:3.5rem; padding:.3rem; border-radius:6px; border:1px solid #ffffff33;
+    background:transparent; color:var(--fg); text-align:center; }
+  body.breaking { --accent:var(--break); }
+  body.breaking #time { color:var(--break); }
+</style>
+</head>
+<body>
+  <h1>Tomacco Timer 🍅</h1>
+  <div id="label">ready</div>
+  <div id="time">00:00</div>
+  <div class="btns">
+    <button id="main">Start working</button>
+    <button id="reset" class="ghost" disabled>Reset</button>
+  </div>
+  <label class="ratio">
+    Break = worked time ÷
+    <input id="ratio" type="number" min="1" step="1" value="5">
+  </label>
+
+<script>
+// States: idle -> working -> resting -> idle
+const $ = id => document.getElementById(id);
+const timeEl=$('time'), labelEl=$('label'), mainBtn=$('main'), resetBtn=$('reset'), ratioEl=$('ratio');
+
+let state='idle';
+let startMs=0;          // when current phase started (perf clock, monotonic)
+let earnedSec=0;        // break seconds granted when resting starts
+let tick=null;
+
+const now = () => performance.now();
+
+function fmt(sec){
+  sec=Math.max(0,Math.round(sec));
+  const m=Math.floor(sec/60), s=sec%60;
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+function render(){
+  if(state==='working'){
+    timeEl.textContent=fmt((now()-startMs)/1000);
+  } else if(state==='resting'){
+    const left=earnedSec-(now()-startMs)/1000;
+    if(left<=0){ finishBreak(); return; }
+    timeEl.textContent=fmt(left);
+  }
+}
+
+function startWork(){
+  state='working'; startMs=now(); earnedSec=0;
+  document.body.classList.remove('breaking');
+  labelEl.textContent='working';
+  mainBtn.textContent='Stop & take break';
+  resetBtn.disabled=false;
+  render();
+  tick=setInterval(render,250);
+}
+
+function startBreak(){
+  const workedSec=(now()-startMs)/1000;
+  const ratio=Math.max(1,parseFloat(ratioEl.value)||5);
+  earnedSec=workedSec/ratio;
+  if(earnedSec<1){ finishBreak(); return; }   // ponytail: too little worked, nothing to rest
+  state='resting'; startMs=now();
+  document.body.classList.add('breaking');
+  labelEl.textContent='break — '+fmt(earnedSec)+' earned';
+  mainBtn.textContent='Skip break';
+  render();
+}
+
+function finishBreak(){
+  clearInterval(tick); tick=null;
+  document.body.classList.remove('breaking');
+  state='idle';
+  labelEl.textContent='break done — go again';
+  timeEl.textContent='00:00';
+  mainBtn.textContent='Start working';
+  resetBtn.disabled=true;
+  try{ new AudioContext(); beep(); }catch(e){}
+}
+
+function reset(){
+  clearInterval(tick); tick=null;
+  state='idle';
+  document.body.classList.remove('breaking');
+  labelEl.textContent='ready';
+  timeEl.textContent='00:00';
+  mainBtn.textContent='Start working';
+  resetBtn.disabled=true;
+}
+
+function beep(){
+  const ac=new AudioContext(), o=ac.createOscillator(), g=ac.createGain();
+  o.connect(g); g.connect(ac.destination); o.frequency.value=660;
+  g.gain.setValueAtTime(.2,ac.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.4);
+  o.start(); o.stop(ac.currentTime+.4);
+}
+
+mainBtn.onclick=()=>{
+  if(state==='idle') startWork();
+  else if(state==='working') startBreak();
+  else if(state==='resting') finishBreak(); // skip
+};
+resetBtn.onclick=reset;
+</script>
+</body>
+</html>
