@@ -1,4 +1,6 @@
-# Tomacco Timer 🍅
+<img src="tomacco.png" alt="Tomacco" height="80">
+
+# Tomacco Timer
 
 Inverse Pomodoro. You start working, stop when done, and earn a break equal to a
 fraction of the time you worked (default 1/5).

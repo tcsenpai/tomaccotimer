@@ -41,6 +41,7 @@
   }
   dialog::backdrop { background:#0009; }
   dialog h2 { font-size:1.1rem; margin-bottom:.7rem; }
+  .ico { height:1.1em; width:auto; vertical-align:-.15em; }
   dialog p { margin-bottom:.7rem; font-size:.9rem; line-height:1.4; }
   dialog ol { text-align:left; margin:0 0 1rem 1.1rem; font-size:.85rem; line-height:1.5; display:grid; gap:.35rem; }
   dialog code { background:#ffffff1a; padding:.1em .35em; border-radius:4px; }
@@ -86,7 +87,7 @@
     <button id="pip" class="ghost" hidden>Pop out</button>
   </div>
   <dialog id="howto">
-    <h2>How Tomacco works 🍅</h2>
+    <h2>How Tomacco works <img src="tomacco.png" alt="" class="ico"></h2>
     <p><b>Inverse Pomodoro.</b> Instead of fixed work/break blocks, your break is earned from what you actually worked.</p>
     <ol>
       <li><b>Start working</b> — timer counts up while you focus.</li>
@@ -171,7 +172,7 @@ function finishBreak(){
   resetBtn.disabled=true;
   try{ beep(); }catch(e){}
   if('Notification'in window && Notification.permission==='granted')
-    new Notification('Tomacco 🍅',{body:'Break finished. Back to work!'});
+    new Notification('Tomacco',{body:'Break finished. Back to work!',icon:'tomacco.png'});
 }
 
 function reset(){
