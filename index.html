@@ -21,6 +21,7 @@
     visibility:hidden; }
   #earned.show { visibility:visible; }
   #stage { display:flex; flex-direction:column; align-items:center; gap:.6rem; }
+  #stage #main { margin-top:.4rem; }
   .btns { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
   button {
     font-size:1.1rem; padding:.7rem 1.6rem; border:none; border-radius:999px;
@@ -41,9 +42,9 @@
     <div id="label">ready</div>
     <div id="time">00:00</div>
     <div id="earned">break earned: 00:00</div>
+    <button id="main">Start working</button>
   </div>
   <div class="btns">
-    <button id="main">Start working</button>
     <button id="reset" class="ghost" disabled>Reset</button>
     <button id="pip" class="ghost" hidden>Pop out</button>
   </div>
@@ -150,7 +151,7 @@ if('documentPictureInPicture'in window) pipBtn.hidden=false;
 
 async function togglePip(){
   if(pipWin){ pipWin.close(); return; }
-  pipWin=await documentPictureInPicture.requestWindow({width:280,height:180});
+  pipWin=await documentPictureInPicture.requestWindow({width:280,height:230});
   // copy styles into pip document
   for(const sheet of document.styleSheets){
     try{
