@@ -3,7 +3,7 @@
 Inverse Pomodoro. You start working, stop when done, and earn a break equal to a
 fraction of the time you worked (default 1/5).
 
-## Use
+## Use directly (no notifications)
 
 Open `index.html` in a browser. No build.
 
@@ -12,7 +12,7 @@ Open `index.html` in a browser. No build.
 - **Ratio** — editable (5 = one fifth of worked time).
 - **Reset** — abandon current work session.
 
-## Optional server
+## Run with server (allows notifications once break ends)
 
 ```sh
 bun run server.js   # http://localhost:3000, PORT env optional
