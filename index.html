@@ -71,6 +71,7 @@ function render(){
 }
 
 function startWork(){
+  if('Notification'in window && Notification.permission==='default') Notification.requestPermission();
   state='working'; startMs=now(); earnedSec=0;
   document.body.classList.remove('breaking');
   labelEl.textContent='working';
@@ -100,7 +101,9 @@ function finishBreak(){
   timeEl.textContent='00:00';
   mainBtn.textContent='Start working';
   resetBtn.disabled=true;
-  try{ new AudioContext(); beep(); }catch(e){}
+  try{ beep(); }catch(e){}
+  if('Notification'in window && Notification.permission==='granted')
+    new Notification('Tomacco 🍅',{body:'Break finished. Back to work!'});
 }
 
 function reset(){
